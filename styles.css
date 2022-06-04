@@ -1,0 +1,60 @@
+html,
+body {
+ 
+	font-family: 'Roboto';
+	color: rgba(0, 0, 0, 0.637);
+    background-image: 
+    url(../static/images/forum2.png);
+    background-position: left;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+  
+}
+
+
+.navBarbtns {
+    
+    font-family: 'Times New Roman', Times, serif,
+    sans-serif;
+    margin: 20px;
+   
+}
+
+.dropdown {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: right;
+}
+.indPosts {
+    text-align: center;
+    margin: 15px;
+}
+
+.commentBtnDiv {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    margin: 10px;
+   
+}
+
+.likeLabel {
+    font-size: 30px;
+    text-align: left;
+}
+
+.commentContent {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: medium;
+    font-weight: 300;
+    text-align: center;
+}
+
+.newPostinputs {
+    text-align: center;
+}
+
+.postBox {
+    margin-bottom: 50px;
+    border-radius: 2%;
+}
+
