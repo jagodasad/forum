@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Forum</title>
+    <link rel="stylesheet" href="./static/styles.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar navbar-dark fixed-top"
+        style="background: linear-gradient(#828896, #3b585a)">
+        <a id="navBarUsername">{{ .Username}}</a>
+        <div class="Navbar-buttons">
+            <div id="Not_Login" class="Not_Login">
+                {{if .CookieChecker}}
+                <span><button id="homeBtn" class="navBarbtns"><a href="/">Home</a></button></span>
+                <span><button id="logoutBtn" class="navBarbtns"><a href="/logout">Log Out</a></button></span>
+                <span><button id="newpostBtn" class="navBarbtns"><a href="/new-post">+Create Post</a></button></span>
+                {{else}}
+                <span><button id="homeBtn" class="navBarbtns"><a href="/">Home</a></button></span>
+                <span><button id="logBtn" class="navBarbtns"><a href="/log">Login</a></button></span>
+                <span><button id="registerBtn" class="navBarbtns"><a href="/register">Register</a></button></span>
+                {{end}}
+            </div>
+        </div>
+    </nav>
+    <div class="newPostinputs">
+        <form method="POST" action="/post-added">
+            <br>
+            <div class="center">
+                <input type="textarea" placeholder="Title" name="title" required pattern=".*\S+.*" maxlenght="40"><br>
+                <div class="center">
+                    <div class="center" >
+                        <LABEL FOR="FE" class="filterLabels"> Animals </LABEL>
+                        <INPUT TYPE="Checkbox" Name="Animals"  id="FE" Value="Animals" class="boxStyle" checked>
+                    </div>
+
+                    <div class="center">
+                        <LABEL FOR="BE" class="filterLabels">Travel </LABEL>
+                        <INPUT TYPE="Checkbox" Name="Travel" id="BE" class="boxStyle" Value="Travel"><br>
+                    </div>
+                    <div class="center">
+                        <LABEL FOR="FS" class="filterLabels"> Movies </LABEL>
+                        <INPUT TYPE="Checkbox" Name="Movies" id="FS" class="boxStyle" Value="Movies"><br>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <textarea rows="17" cols="60" class="postBox" name="post" placeholder=" Add your post here..." required pattern=".*\S+.*"></textarea>
+                <br>
+                <input type="submit" id="postSubmit" value="Submit">
+            </div>
+        </form>
+
+    </div>
+
+    {{if .PostAdded}}
+    <div id="PostModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Your post has been added</p>
+        </div>
+
+    </div>
+    {{end}}
+    <script>
+        var modal = document.getElementById("myModal");
+        var btn = document.getElementById("postSubmit");
+
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+</body>
+
+</html>
