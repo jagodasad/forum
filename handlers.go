@@ -38,7 +38,6 @@ func LoginResult(w http.ResponseWriter, r *http.Request) {
 	if Person.Accesslevel && Person.CookieChecker {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else if Person.Accesslevel {
-		//The user is already logged in
 		Person.Attempted = false
 		tpl := template.Must(template.ParseGlob("templates/login.html"))
 		if err := tpl.Execute(w, Person); err != nil {
@@ -46,7 +45,6 @@ func LoginResult(w http.ResponseWriter, r *http.Request) {
 		}
 	} else if ValidEmail(email, sqliteDatabase) {
 		if LoginValidator(email, pass, sqliteDatabase) {
-			//Create the cookie
 
 			if Person.Accesslevel {
 				cookie, err := r.Cookie("1st-cookie")
@@ -207,46 +205,38 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "400 Status Bad Request", http.StatusBadRequest)
 		return
 	}
-	//Likes
 	postNum := r.FormValue("likeBtn")
 	fmt.Printf("\n LIKE BUTTON VALUE \n")
 	fmt.Println(postNum)
 	LikeButton(postNum, sqliteDatabase)
 
-	//Dislikes
 	dislikePostNum := r.FormValue("dislikeBtn")
 	fmt.Printf("\n\n\n?????????????????????????????DISLIKE BUTTON VALUE : %v \n \n", dislikePostNum)
 	DislikeButton(dislikePostNum, sqliteDatabase)
 
-	// comments
 	comment := r.FormValue("commentTxt")
 	commentPostID := r.FormValue("commentSubmit")
 	fmt.Printf("ADDING COMMENT: %v", commentPostID)
 	newComment(Person.Username, commentPostID, comment, sqliteDatabase)
 
-	//Comment likes
 	commentNum := r.FormValue("commentlikeBtn")
 	fmt.Printf("\n Comment LIKE BUTTON VALUE")
 	fmt.Println(commentNum)
 	CommentLikeButton(commentNum, sqliteDatabase)
 
-	//Dislike comments
 	commentDislike := r.FormValue("commentDislikeBtn")
 	fmt.Printf("\nDISLIKE BUTTON VALUE \n")
 	CommentDislikeButton(commentDislike, sqliteDatabase)
 
-	//Make a button that gives a value depending on the filter button
 	FE := r.FormValue("FEfilter")
 	BE := r.FormValue("BEfilter")
 	FS := r.FormValue("FSfilter")
 	MyLikes := r.FormValue("likedPosts")
 	Created := r.FormValue("myPosts")
 
-	// all := r.FormValue("allfilter")
 	postSlc := []postDisplay{}
 	if FE == "Animals" {
 		frontEndSlc := []string{}
-		//Create a query that gets the postIDs needed
 		animals, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Animals = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
@@ -267,7 +257,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	} else if BE == "Travel" {
 		BackEndSlc := []string{}
-		//Create a query that gets the postIDs needed
 		travel, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Travel = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
@@ -288,7 +277,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	} else if FS == "Movies" {
 		FullStackSlc := []string{}
-		//Create a query that gets the postIDs needed
 		movies, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Movies= 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
@@ -309,7 +297,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	} else if MyLikes == "Liked Posts" {
 		likedSlc := []string{}
-		//Create a query that gets the postIDs needed
 		likedRows, errGetIDs := sqliteDatabase.Query("SELECT postID from liketable WHERE reference = 1 AND user = (?)", Person.Username)
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
@@ -329,7 +316,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		postSlc = PostGetter(likedSlc, sqliteDatabase)
 	} else if Created == "My Posts" {
 		myPostsSlc := []string{}
-		//Create a query that gets the postIDs needed
 		myPostsRows, errGetIDs := sqliteDatabase.Query("SELECT postID from posts WHERE userName = (?)", Person.Username)
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
@@ -362,22 +348,18 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("1st-cookie")
 
 	if err != nil && Person.Accesslevel {
-		//logged in and on 2nd browser
 		Person.CookieChecker = false
 
 	} else if err == nil && Person.Accesslevel {
-		//Original browser
 		Person.CookieChecker = true
 
 	} else {
-		// not logged in yet
 		Person.CookieChecker = false
 	}
 
 	fmt.Printf("\n\n\n------------------------------------------------------------------Struct BEFORE: %v\n\n\n\n", Person)
 
 	fmt.Printf("\n\n\n------------------------------------------------------------------Struct AFTER: %v\n\n\n\n", Person)
-	//Initialise the homePAgeStruct to pass through multiple data types
 	x := homePageStruct{MembersPost: Person, PostingDisplay: postSlc}
 
 	tpl := template.Must(template.ParseGlob("templates/index.html"))

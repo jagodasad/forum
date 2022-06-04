@@ -18,15 +18,12 @@ func main() {
 	file.Close()
 	fmt.Println("SQL Databasefile created")
 
-	//Open the database SQLite file and create the database table
 	sqliteDatabase, err1 := sql.Open("sqlite3", "sqlite-database.db")
 	if err1 != nil {
 		log.Fatal(err1.Error())
 	}
-	//Defer the close
 	defer sqliteDatabase.Close()
 
-	//Create the database for each user
 	_, errTbl := sqliteDatabase.Exec(`
 		CREATE TABLE IF NOT EXISTS "users" (
 			"ID"	TEXT,
@@ -41,9 +38,6 @@ func main() {
 		log.Fatal(errTbl.Error())
 	}
 
-	// usersTbl.Exec()
-
-	//Create the posts table
 	_, errPosts := sqliteDatabase.Exec(`
 		CREATE TABLE IF NOT EXISTS "posts" (
 			"postID"	TEXT,
@@ -61,7 +55,6 @@ func main() {
 		log.Fatal(errPosts.Error())
 	}
 
-	//Create the cookies table
 	_, errCookie := sqliteDatabase.Exec(`
 		CREATE TABLE IF NOT EXISTS "cookies" (
 			"name"	TEXT,
@@ -74,7 +67,6 @@ func main() {
 		log.Fatal(errTbl.Error())
 	}
 
-	//Create the likes table
 	_, errLikes := sqliteDatabase.Exec(`
 		CREATE TABLE IF NOT EXISTS "liketable" (
 			user	TEXT,	
@@ -89,7 +81,6 @@ func main() {
 		log.Fatal(errPosts.Error())
 	}
 
-	//Create the table for each user
 	_, errComments := sqliteDatabase.Exec(`
 		CREATE TABLE IF NOT EXISTS "comments" (
 			"commentID" TEXT,
@@ -106,7 +97,6 @@ func main() {
 		log.Fatal(errTbl.Error())
 	}
 
-	//Create the database for each user
 	_, errCategories := sqliteDatabase.Exec(`
 		CREATE TABLE IF NOT EXISTS "categories" (
 			"postID"	TEXT,

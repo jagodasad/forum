@@ -31,9 +31,7 @@ type commentStruct struct {
 	CookieChecker   bool
 }
 
-//newPost creates a new post by a registered user
 func newPost(userName, category, title, post string, db *sql.DB) {
-	//If the title is empty the form is resubitting once all values have been reset so the post shouldn't be added to the database
 	if title == "" {
 		return
 	}
@@ -47,8 +45,6 @@ func newPost(userName, category, title, post string, db *sql.DB) {
 	}
 	Person.PostAdded = true
 
-	//Add the post to the Category table with relevant categories selected
-	//Split the category string by Spaces to see which categories are selected
 	catSlc := strings.Split(category, " ")
 	feSelected := 0
 	beSelected := 0
@@ -64,7 +60,6 @@ func newPost(userName, category, title, post string, db *sql.DB) {
 		}
 	}
 
-	//Now add the relevant value to the category in the category table
 	_, errAddCats := db.Exec("INSERT INTO categories (postID, Animals, Travel, Movies) VALUES (?, ?, ?, ?)", uuid, feSelected, beSelected, fsSelected)
 	if errAddCats != nil {
 		fmt.Println("ERROR when adding into the category table")
@@ -98,8 +93,6 @@ func postData(db *sql.DB) []postDisplay {
 			log.Fatal(err.Error())
 		}
 
-		//Get comments for the relevent post]
-		//Make []commentstruct to hold all the comments
 		commentSlc := []commentStruct{}
 		var tempComStruct commentStruct
 
@@ -127,10 +120,8 @@ func postData(db *sql.DB) []postDisplay {
 		}
 		u.Comments = commentSlc
 
-		//Append all post information to the finalarray
 		finalArray = append(finalArray, u)
 
-		//Reverse finalArray so that the most recently added posts show first
 		for i, j := 0, len(finalArray)-1; i < j; i, j = i+1, j-1 {
 			finalArray[i], finalArray[j] = finalArray[j], finalArray[i]
 		}
@@ -139,7 +130,6 @@ func postData(db *sql.DB) []postDisplay {
 }
 
 func LikeButton(postID string, db *sql.DB) {
-	//Check if the user has already liked this post/comment
 	findRow, errRows := db.Query("SELECT reference FROM liketable WHERE postID = (?) AND user = (?)", postID, Person.Username)
 	if errRows != nil {
 		fmt.Println("SELECTING LIKE ERROR")
@@ -159,7 +149,6 @@ func LikeButton(postID string, db *sql.DB) {
 		}
 	}
 
-	//If rounds still equals 0 no row was found so we can insert the relevant row into our liketable
 	if rounds == 0 {
 		_, insertLikeErr := db.Exec("INSERT INTO liketable (user, postID, reference) VALUES (?, ?, 1)", Person.Username, postID)
 		if insertLikeErr != nil {
@@ -167,26 +156,19 @@ func LikeButton(postID string, db *sql.DB) {
 			log.Fatal(insertLikeErr.Error())
 		}
 
-		//Increase likes
 		LikeIncrease(postID, sqliteDatabase)
 	} else {
-		//Reference is equal to 1 so we need to undo the like action
 		if check.Likes == 1 {
 			LikeUndo(postID, sqliteDatabase)
-			//Update reference to 0
 			RefUpdate(0, postID, sqliteDatabase)
 		} else if check.Likes == -1 {
-			//user has already disliked so we must undislike the post and set it as liked
 			DislikeUndo(postID, sqliteDatabase)
 			LikeIncrease(postID, sqliteDatabase)
-			//Update reference equal to 1
 
 			RefUpdate(1, postID, sqliteDatabase)
 
 		} else if check.Likes == 0 {
-			//Increase likes only
 			LikeIncrease(postID, sqliteDatabase)
-			//set reference to 1
 			RefUpdate(1, postID, sqliteDatabase)
 
 		}
@@ -209,7 +191,6 @@ func CommentRefUpdate(value int, postID string, db *sql.DB) {
 }
 
 func LikeIncrease(postID string, db *sql.DB) {
-	//Increase likes
 
 	likes, err := db.Query("SELECT likes FROM posts WHERE postID = (?)", postID)
 	if err != nil {
@@ -317,7 +298,6 @@ func DislikeUndo(postID string, db *sql.DB) {
 
 func DislikeButton(postID string, db *sql.DB) {
 	fmt.Printf("\n\n--------------THE POSTID FOR THE BUTTON CLICKED IS: %v \n\n", postID)
-	//Check if the user has already liked/disliked this post/comment
 	findRow, errRows := db.Query("SELECT reference FROM liketable WHERE postID = (?) AND user = (?)", postID, Person.Username)
 	if errRows != nil {
 		fmt.Println("SELECTING LIKE ERROR")
@@ -338,41 +318,29 @@ func DislikeButton(postID string, db *sql.DB) {
 		}
 	}
 
-	//if rounds == 0 the user hasnt liked or disliked this post/comment yet
 	if rounds == 0 {
-		//Add the user to the liketable
 		_, insertLikeErr := db.Exec("INSERT INTO liketable (user, postID, reference) VALUES (?, ?, -1)", Person.Username, postID)
 		if insertLikeErr != nil {
 			fmt.Println("Error when inserting into like table initially (DISLIKEBUTTON)")
 			log.Fatal(insertLikeErr.Error())
 		}
-		//Increase number of dslikes
 		DislikeIncrease(postID, sqliteDatabase)
 
 	} else {
 		if check.Likes == -1 {
-			//The user has already disliked so we need to undo the dislike action
 			DislikeUndo(postID, sqliteDatabase)
-			//Change reference to 0
 			RefUpdate(0, postID, sqliteDatabase)
 		} else if check.Likes == 1 {
-			//User has previously liked so we need to undo the like and dislike the comment
-			//Undo like
 			LikeUndo(postID, sqliteDatabase)
-			// Increase dislike
 			DislikeIncrease(postID, sqliteDatabase)
-			//Set reference equal to -1
 			RefUpdate(-1, postID, sqliteDatabase)
 		} else if check.Likes == 0 {
-			//The user is not currently liking or disliking the post so we need to increase dislike
 			DislikeIncrease(postID, sqliteDatabase)
-			//update reference to -1
 			RefUpdate(-1, postID, sqliteDatabase)
 		}
 	}
 }
 
-//Add a new comment to a post
 func newComment(userName, postID, commentText string, db *sql.DB) {
 	if commentText == "" {
 		return
@@ -390,7 +358,6 @@ func newComment(userName, postID, commentText string, db *sql.DB) {
 }
 
 func CommentLikeButton(postID string, db *sql.DB) {
-	//Check if the user has already liked this post/comment
 	findRow, errRows := db.Query("SELECT reference FROM liketable WHERE commentID = (?) AND user = (?)", postID, Person.Username)
 	if errRows != nil {
 		fmt.Println("SELECTING LIKE ERROR")
@@ -410,7 +377,6 @@ func CommentLikeButton(postID string, db *sql.DB) {
 		}
 	}
 
-	//If rounds still equals 0 no row was found so we can insert the relevant row into our liketable
 	if rounds == 0 {
 		_, insertLikeErr := db.Exec("INSERT INTO liketable (user, commentID, reference) VALUES (?, ?, 1)", Person.Username, postID)
 		if insertLikeErr != nil {
@@ -418,28 +384,21 @@ func CommentLikeButton(postID string, db *sql.DB) {
 			log.Fatal(insertLikeErr.Error())
 		}
 
-		//Increase likes
 		CommentLikeIncrease(postID, sqliteDatabase)
 	} else {
-		//Reference is equal to 1 so we need to undo the like action
 
 		fmt.Printf("\n ------------------------------------------------------------------REFERENCE is equal to: %v", check.Likes)
 		if check.Likes == 1 {
 			CommentLikeUndo(postID, sqliteDatabase)
-			//Update reference to 0
 			CommentRefUpdate(0, postID, sqliteDatabase)
 		} else if check.Likes == -1 {
-			//user has already disliked so we must undislike the post and set it as liked
 			CommentDislikeUndo(postID, sqliteDatabase)
 			CommentLikeIncrease(postID, sqliteDatabase)
-			//Update reference equal to 1
 
 			CommentRefUpdate(1, postID, sqliteDatabase)
 
 		} else if check.Likes == 0 {
-			//Increase likes only
 			CommentLikeIncrease(postID, sqliteDatabase)
-			//set reference to 1
 			CommentRefUpdate(1, postID, sqliteDatabase)
 
 		}
@@ -447,7 +406,6 @@ func CommentLikeButton(postID string, db *sql.DB) {
 }
 
 func CommentLikeIncrease(postID string, db *sql.DB) {
-	//Increase likes
 
 	likes, err := db.Query("SELECT likes FROM comments WHERE commentID = (?)", postID)
 	if err != nil {
@@ -556,7 +514,6 @@ func CommentDislikeIncrease(postID string, db *sql.DB) {
 }
 
 func CommentDislikeButton(postID string, db *sql.DB) {
-	//Check if the user has already liked/disliked this post/comment
 	findRow, errRows := db.Query("SELECT reference FROM liketable WHERE commentID = (?) AND user = (?)", postID, Person.Username)
 	if errRows != nil {
 		fmt.Println("SELECTING LIKE ERROR")
@@ -577,46 +534,31 @@ func CommentDislikeButton(postID string, db *sql.DB) {
 		}
 	}
 
-	//if rounds == 0 the user hasnt liked or disliked this post/comment yet
 	if rounds == 0 {
-		//Add the user to the liketable
 		_, insertLikeErr := db.Exec("INSERT INTO liketable (user, commentID, reference) VALUES (?, ?, -1)", Person.Username, postID)
 		if insertLikeErr != nil {
 			fmt.Println("Error when inserting into like table initially (DISLIKEBUTTON)")
 			log.Fatal(insertLikeErr.Error())
 		}
-		//Increase number of dslikes
 		CommentDislikeIncrease(postID, sqliteDatabase)
 
 	} else {
 		if check.Likes == -1 {
-			//The user has already disliked so we need to undo the dislike action
 			CommentDislikeUndo(postID, sqliteDatabase)
-			//Change reference to 0
 			CommentRefUpdate(0, postID, sqliteDatabase)
 		} else if check.Likes == 1 {
-			//User has previously liked so we need to undo the like and dislike the comment
-			//Undo like
 			CommentLikeUndo(postID, sqliteDatabase)
-			// Increase dislike
 			CommentDislikeIncrease(postID, sqliteDatabase)
-			//Set reference equal to -1
 			CommentRefUpdate(-1, postID, sqliteDatabase)
 		} else if check.Likes == 0 {
-			//The user is not currently liking or disliking the post so we need to increase dislike
 			CommentDislikeIncrease(postID, sqliteDatabase)
-			//update reference to -1
 			CommentRefUpdate(-1, postID, sqliteDatabase)
 		}
 	}
 }
 
-//Make a function that takes in a slice of postIDs and returns a slice of poststructs with all the details
-
 func PostGetter(postIDSlc []string, db *sql.DB) []postDisplay {
-	//Create a slice of postdetail structs
 	finalArray := []postDisplay{}
-	//loop through the slice to get each postID
 	for _, r := range postIDSlc {
 		rows, errDetails := db.Query("SELECT postID, userName, category, likes, dislikes, title, post FROM posts WHERE postID = (?)", r)
 		if errDetails != nil {

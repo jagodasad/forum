@@ -24,7 +24,6 @@ type userDetails struct {
 	PostAdded              bool
 }
 
-//newUser registers a new user to the database selected
 func newUser(email, username, password string, db *sql.DB) {
 	hash, err := HashPassword(password)
 	if err != nil {
@@ -40,7 +39,6 @@ func newUser(email, username, password string, db *sql.DB) {
 
 }
 
-//userExsists checks if the username entered is already taken. If it is the function returns true.
 func userExist(email, username string, db *sql.DB) (bool, string) {
 	rows, err := db.Query("SELECT email FROM users WHERE email = ?", email)
 	if err != nil {
@@ -74,7 +72,6 @@ func userExist(email, username string, db *sql.DB) (bool, string) {
 	}
 }
 
-//ValidEmail checks if the email entered exists in the database
 func ValidEmail(email string, db *sql.DB) bool {
 	rows, err := db.Query("SELECT email FROM users WHERE email = ?", email)
 	if err != nil {
@@ -93,7 +90,6 @@ func ValidEmail(email string, db *sql.DB) bool {
 	}
 }
 
-//LoginValidaro checks if the email and passwords entered are the same
 func LoginValidator(email, password string, db *sql.DB) bool {
 	rows1, err1 := db.Query("SELECT ID, email, username, password FROM users WHERE email = ?", email)
 
@@ -132,7 +128,6 @@ func LoginValidator(email, password string, db *sql.DB) bool {
 
 }
 
-//HashPassword encrypts the password entered when registering
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
