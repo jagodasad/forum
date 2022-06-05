@@ -19,12 +19,12 @@ func main() {
 	if err1 != nil {
 		log.Fatal(err1.Error())
 	}
+
 	defer sqliteDatabase.Close()
 
 	fs := http.FileServer(http.Dir("./static"))
 
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/log", LoginHandler)
 	http.HandleFunc("/login", LoginResult)
