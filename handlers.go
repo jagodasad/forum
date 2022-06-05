@@ -240,7 +240,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	if Animals == "Animals" {
 		frontEndSlc := []string{}
 
-		frontEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Animals = 1")
+		frontEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE FrontEnd = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
@@ -261,7 +261,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	} else if Travel == "Travel" {
 		BackEndSlc := []string{}
 
-		backEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Travel = 1")
+		backEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE BackEnd = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
@@ -282,7 +282,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	} else if Movies == "Movies" {
 		FullStackSlc := []string{}
 
-		FullStackRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Movies = 1")
+		FullStackRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE FullStack = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
