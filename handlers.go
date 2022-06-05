@@ -38,6 +38,7 @@ func LoginResult(w http.ResponseWriter, r *http.Request) {
 	if Person.Accesslevel && Person.CookieChecker {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else if Person.Accesslevel {
+
 		Person.Attempted = false
 		tpl := template.Must(template.ParseGlob("templates/login.html"))
 		if err := tpl.Execute(w, Person); err != nil {
@@ -161,11 +162,11 @@ func postAdded(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "400 Status Bad Request", http.StatusBadRequest)
 		return
 	}
-	FEcat := r.FormValue("Animals")
-	BEcat := r.FormValue("Travel")
-	FScat := r.FormValue("Movies")
+	Animalscat := r.FormValue("Animals")
+	Travelcat := r.FormValue("Travel")
+	Moviescat := r.FormValue("Movies")
 
-	cat := FEcat + " " + BEcat + " " + FScat
+	cat := Animalscat + " " + Travelcat + " " + Moviescat
 
 	c := []rune(cat)
 	category := []rune{}
@@ -205,6 +206,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "400 Status Bad Request", http.StatusBadRequest)
 		return
 	}
+
 	postNum := r.FormValue("likeBtn")
 	fmt.Printf("\n LIKE BUTTON VALUE \n")
 	fmt.Println(postNum)
@@ -228,23 +230,24 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("\nDISLIKE BUTTON VALUE \n")
 	CommentDislikeButton(commentDislike, sqliteDatabase)
 
-	FE := r.FormValue("FEfilter")
-	BE := r.FormValue("BEfilter")
-	FS := r.FormValue("FSfilter")
+	Animals := r.FormValue("Animals")
+	Travel := r.FormValue("Travel")
+	Movies := r.FormValue("Movies")
 	MyLikes := r.FormValue("likedPosts")
 	Created := r.FormValue("myPosts")
 
 	postSlc := []postDisplay{}
-	if FE == "Animals" {
+	if Animals == "Animals" {
 		frontEndSlc := []string{}
-		animals, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Animals = 1")
+
+		frontEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Animals = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
-		for animals.Next() {
+		for frontEndRows.Next() {
 			var GetIDs commentStruct
 
-			err := animals.Scan(
+			err := frontEndRows.Scan(
 				&GetIDs.CommentID,
 			)
 			if err != nil {
@@ -255,16 +258,17 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		}
 		postSlc = PostGetter(frontEndSlc, sqliteDatabase)
 
-	} else if BE == "Travel" {
+	} else if Travel == "Travel" {
 		BackEndSlc := []string{}
-		travel, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Travel = 1")
+
+		backEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Travel = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
-		for travel.Next() {
+		for backEndRows.Next() {
 			var GetIDs commentStruct
 
-			err := travel.Scan(
+			err := backEndRows.Scan(
 				&GetIDs.CommentID,
 			)
 			if err != nil {
@@ -275,16 +279,17 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		}
 		postSlc = PostGetter(BackEndSlc, sqliteDatabase)
 
-	} else if FS == "Movies" {
+	} else if Movies == "Movies" {
 		FullStackSlc := []string{}
-		movies, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Movies= 1")
+
+		FullStackRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Movies = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
-		for movies.Next() {
+		for FullStackRows.Next() {
 			var GetIDs commentStruct
 
-			err := movies.Scan(
+			err := FullStackRows.Scan(
 				&GetIDs.CommentID,
 			)
 			if err != nil {
@@ -297,7 +302,8 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	} else if MyLikes == "Liked Posts" {
 		likedSlc := []string{}
-		likedRows, errGetIDs := sqliteDatabase.Query("SELECT postID from liketable WHERE reference = 1 AND user = (?)", Person.Username)
+
+		likedRows, errGetIDs := sqliteDatabase.Query("SELECT postID from liketable WHERE reAnimalsrence = 1 AND user = (?)", Person.Username)
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
@@ -316,6 +322,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		postSlc = PostGetter(likedSlc, sqliteDatabase)
 	} else if Created == "My Posts" {
 		myPostsSlc := []string{}
+
 		myPostsRows, errGetIDs := sqliteDatabase.Query("SELECT postID from posts WHERE userName = (?)", Person.Username)
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
@@ -348,18 +355,22 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("1st-cookie")
 
 	if err != nil && Person.Accesslevel {
+
 		Person.CookieChecker = false
 
 	} else if err == nil && Person.Accesslevel {
+
 		Person.CookieChecker = true
 
 	} else {
+
 		Person.CookieChecker = false
 	}
 
 	fmt.Printf("\n\n\n------------------------------------------------------------------Struct BEFORE: %v\n\n\n\n", Person)
 
 	fmt.Printf("\n\n\n------------------------------------------------------------------Struct AFTER: %v\n\n\n\n", Person)
+
 	x := homePageStruct{MembersPost: Person, PostingDisplay: postSlc}
 
 	tpl := template.Must(template.ParseGlob("templates/index.html"))
