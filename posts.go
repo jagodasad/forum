@@ -47,21 +47,21 @@ func newPost(userName, category, title, post string, db *sql.DB) {
 	Person.PostAdded = true
 
 	catSlc := strings.Split(category, " ")
-	feSelected := 0
-	beSelected := 0
-	fsSelected := 0
+	animalsSelected := 0
+	travelSelected := 0
+	moviesSelected := 0
 
 	for _, r := range catSlc {
 		if r == "Animals" {
-			feSelected = 1
+			animalsSelected = 1
 		} else if r == "Travel" {
-			beSelected = 1
+			travelSelected = 1
 		} else if r == "Movies" {
-			fsSelected = 1
+			moviesSelected = 1
 		}
 	}
 
-	_, errAddCats := db.Exec("INSERT INTO categories (postID, Animals, Travel, Movies) VALUES (?, ?, ?, ?)", uuid, feSelected, beSelected, fsSelected)
+	_, errAddCats := db.Exec("INSERT INTO categories (postID, Animals, Travel, Movies) VALUES (?, ?, ?, ?)", uuid, animalsSelected, travelSelected, moviesSelected)
 	if errAddCats != nil {
 		fmt.Println("ERROR when adding into the category table")
 	}
