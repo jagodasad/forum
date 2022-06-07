@@ -238,72 +238,72 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	postSlc := []postDisplay{}
 	if Animals == "Animals" {
-		frontEndSlc := []string{}
+		AnimalsSlc := []string{}
 
-		frontEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE FrontEnd = 1")
+		animalRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Animals = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
-		for frontEndRows.Next() {
+		for animalRows.Next() {
 			var GetIDs commentStruct
 
-			err := frontEndRows.Scan(
+			err := animalRows.Scan(
 				&GetIDs.CommentID,
 			)
 			if err != nil {
 				fmt.Println("Error Scanning through rows")
 			}
 
-			frontEndSlc = append(frontEndSlc, GetIDs.CommentID)
+			AnimalsSlc = append(AnimalsSlc, GetIDs.CommentID)
 		}
-		postSlc = PostGetter(frontEndSlc, sqliteDatabase)
+		postSlc = PostGetter(AnimalsSlc, sqliteDatabase)
 
 	} else if Travel == "Travel" {
-		BackEndSlc := []string{}
+		TravelSlc := []string{}
 
-		backEndRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE BackEnd = 1")
+		travelRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Travel = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
-		for backEndRows.Next() {
+		for travelRows.Next() {
 			var GetIDs commentStruct
 
-			err := backEndRows.Scan(
+			err := travelRows.Scan(
 				&GetIDs.CommentID,
 			)
 			if err != nil {
 				fmt.Println("Error Scanning through rows")
 			}
 
-			BackEndSlc = append(BackEndSlc, GetIDs.CommentID)
+			TravelSlc = append(TravelSlc, GetIDs.CommentID)
 		}
-		postSlc = PostGetter(BackEndSlc, sqliteDatabase)
+		postSlc = PostGetter(TravelSlc, sqliteDatabase)
 
 	} else if Movies == "Movies" {
-		FullStackSlc := []string{}
+		MoviesSlc := []string{}
 
-		FullStackRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE FullStack = 1")
+		MoviesRows, errGetIDs := sqliteDatabase.Query("SELECT postID from categories WHERE Movies = 1")
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
-		for FullStackRows.Next() {
+		for MoviesRows.Next() {
 			var GetIDs commentStruct
 
-			err := FullStackRows.Scan(
+			err := MoviesRows.Scan(
 				&GetIDs.CommentID,
 			)
 			if err != nil {
 				fmt.Println("Error Scanning through rows")
 			}
 
-			FullStackSlc = append(FullStackSlc, GetIDs.CommentID)
+			MoviesSlc = append(MoviesSlc, GetIDs.CommentID)
 		}
-		postSlc = PostGetter(FullStackSlc, sqliteDatabase)
+		postSlc = PostGetter(MoviesSlc, sqliteDatabase)
 
 	} else if MyLikes == "Liked Posts" {
 		likedSlc := []string{}
 
-		likedRows, errGetIDs := sqliteDatabase.Query("SELECT postID from liketable WHERE reAnimalsrence = 1 AND user = (?)", Person.Username)
+		likedRows, errGetIDs := sqliteDatabase.Query("SELECT postID from liketable WHERE reference = 1 AND user = (?)", Person.Username)
 		if errGetIDs != nil {
 			fmt.Println("EEROR trying to SELECT the posts with front end ID")
 		}
